@@ -30,14 +30,17 @@ class BittrexTradesMessageParser(
 
     override fun parseMessage(jsonRoot: JsonNode): ExchangeMessage? {
         return when {
-            jsonRoot["type"].asText() == "last_match" -> parseMarketDataIncrementalRefresh(jsonRoot)
-            jsonRoot["type"].asText() == "match" -> parseMarketDataIncrementalRefresh(jsonRoot)
+            jsonRoot["type"]?.asText() == "last_match" -> parseMarketDataIncrementalRefresh(jsonRoot)
+            jsonRoot["type"]?.asText() == "match" -> parseMarketDataIncrementalRefresh(jsonRoot)
+            jsonRoot["M"].toList()[0]["M"].asText()=="updateExchangeState" -> parseMarketDataIncrementalRefresh(jsonRoot)
             else -> null
         }
     }
 
     private fun parseMarketDataIncrementalRefresh(node: JsonNode): ExchangeMessage {
-
+        //node["M"].toList()[0]["A"].toList()[0]["Buys"]
+        //node["M"].toList()[0]["A"].toList()[0]["Sells"]
+        //node["M"].toList()[0]["A"].toList()[0]["Fills"]
         val symbol = node["product_id"].asText()
         val tokensPair =
                 channelSymbolForTokensPair[symbol] ?: return ContainingUnknownTokensPairMessage(symbol)

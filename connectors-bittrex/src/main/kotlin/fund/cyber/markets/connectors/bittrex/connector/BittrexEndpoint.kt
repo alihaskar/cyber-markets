@@ -1,6 +1,5 @@
 package fund.cyber.markets.connectors.bittrex.connector
 
-import fund.cyber.markets.connectors.common.BITTREX_WS_ENDPOINT
 import fund.cyber.markets.connectors.common.ExchangeMessage
 import fund.cyber.markets.connectors.common.GDAX_WS_ENDPOINT
 import fund.cyber.markets.connectors.common.ws.OrdersWsEndpoint
@@ -8,14 +7,9 @@ import fund.cyber.markets.connectors.common.ws.TradesWsEndpoint
 import fund.cyber.markets.connectors.common.ws.pusher.PusherMessage
 import org.slf4j.LoggerFactory
 
-class BittrexTradesEndpoint (
-        val transport : String,
-        val clientProtocol : String,
-        val connectionToken : String,
-        val connectionData : String,
-        val queryTimestamp : Long,
-        val tid : Int
-): TradesWsEndpoint(BITTREX_WS_ENDPOINT) {
+class BittrexTradesEndpoint(
+        val wsConnectionUrl : String
+) : TradesWsEndpoint(wsConnectionUrl) {
 
     private val LOGGER = LoggerFactory.getLogger(BittrexTradesEndpoint::class.java)!!
 
@@ -24,7 +18,8 @@ class BittrexTradesEndpoint (
     override val pairsProvider = BittrexPairsProvider()
 
     override fun getSubscriptionMsgByChannelSymbol(pairSymbol: String): String {
-        return """{"type":"subscribe","channels":[{"name":"matches","product_ids":["$pairSymbol"]}]}"""
+//        return """{"type":"subscribe","channels":[{"name":"matches","product_ids":["$pairSymbol"]}]}"""
+        return """{"H":"corehub","M":"SubscribeToExchangeDeltas","A":["BTC-LTC"],"I":0}"""
     }
 
     override fun handleUnknownMessage(message: ExchangeMessage) {
@@ -34,6 +29,7 @@ class BittrexTradesEndpoint (
             super.handleUnknownMessage(message)
         }
     }
+
 
 }
 
