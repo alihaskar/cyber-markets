@@ -16,9 +16,11 @@ class BittrexPairsProvider : PairsProvider {
         val response = httpClient.newCall(symbolsRequest).await()
         //todo: add checkResponse isAvailableResource()
         val pairsTickers = jsonParser.readTree(response.body()?.string())
-        pairsTickers.toList()?.forEach { pair ->
-            result.put(pair.get("id").asText(),
-                    TokensPairInitializer(pair.get("base_currency").asText(), pair.get("quote_currency").asText()))
+        pairsTickers.get("result").toList()?.forEach { pair ->
+            if(pair.get("IsActive").asBoolean()) {
+                result.put(pair.get("MarketName").asText(),
+                        TokensPairInitializer(pair.get("BaseCurrency").asText(), pair.get("MarketCurrency").asText()))
+            }
         }
         return result
     }

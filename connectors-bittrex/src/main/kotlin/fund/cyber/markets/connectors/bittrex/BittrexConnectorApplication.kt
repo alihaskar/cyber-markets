@@ -8,21 +8,24 @@ import fund.cyber.markets.connectors.common.kafka.TradeProducerRecord
 import fund.cyber.markets.connectors.helpers.concurrent
 import fund.cyber.markets.model.OrdersBatch
 import fund.cyber.markets.model.Trade
+import java.sql.Timestamp
 
 val tradeKafkaProducer = ConnectorKafkaProducer<Trade>()
 val orderKafkaProducer = ConnectorKafkaProducer<OrdersBatch>()
 fun main(args: Array<String>) {
     val debugMode = System.getProperty("debug") != null
-    val supportedTradesEndpoints = listOf(
-            BittrexTradesEndpoint()
-    )
-    val supportedOrdersEndpoints = listOf(
-            BittrexOrdersEndpoint()
+    val bittrexEndpoint = BittrexTradesEndpoint(
+            clientProtocol = "1.5",
+            connectionData = "[{\"name\":\"corehub\"}]",
+            queryTimestamp = System.currentTimeMillis(),
+            transport = "webSockets",
+            connectionToken = "",
+            tid = 3
     )
 
-    supportedTradesEndpoints.forEach { exchange ->
+//    supportedTradesEndpoints.forEach { exchange ->
         concurrent {
-            val dataChannel = exchange.subscribe()
+            val dataChannel = bittrexEndpoint.subscribe()
             concurrent {
                 while (true) {
                     val message = dataChannel.receive()
@@ -32,18 +35,18 @@ fun main(args: Array<String>) {
                 }
             }
         }
-    }
+//    }
 
-    supportedOrdersEndpoints.forEach { exchange ->
-        concurrent {
-            val dataChannel = exchange.subscribe()
-            concurrent {
-                while (true) {
-                    val message = dataChannel.receive()
-                    if (debugMode) println(message)
-                    else orderKafkaProducer.send(OrdersUpdateProducerRecord(message.ordersBatch))
-                }
-            }
-        }
-    }
+//    supportedOrdersEndpoints.forEach { exchange ->
+//        concurrent {
+//            val dataChannel = exchange.subscribe()
+//            concurrent {
+//                while (true) {
+//                    val message = dataChannel.receive()
+//                    if (debugMode) println(message)
+//                    else orderKafkaProducer.send(OrdersUpdateProducerRecord(message.ordersBatch))
+//                }
+//            }
+//        }
+//    }
 }
