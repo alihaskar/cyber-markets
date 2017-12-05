@@ -182,6 +182,20 @@ project(":connectors-gdax") {
     }
 }
 
+project(":connectors-bittrex") {
+    apply plugin: "application"
+
+    dependencies {
+        compile(project(":connectors-core"))
+    }
+
+    mainClassName = "fund.cyber.markets.connectors.binance.BinanceConnectorApplicationKt"
+
+    run {
+        systemProperties System.getProperties()
+    }
+}
+
 project(":core") {
     dependencies {
         compile("org.slf4j:slf4j-api")
